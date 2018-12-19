@@ -1,0 +1,12 @@
+- podr prostøední tlaèítko na kostce EV3
+- pøipoj USB kabelem
+- otevøi BricxCC, v popupu zadej usb/EV3
+	- tohle nemá vliv na samotnou komunikaci, ale pouze na syntax + kompilace (kterou není potøeba dìlat)
+	- v adresáøi ./code je nìjaká funkèní ukázka kódu
+	- kód jenom ulo, není potøeba jej kompilovat - to si provede nxc4ev3 sám, je to dobré jen pro error check
+
+- otevøi ./nxc4ev3/nxc2cc.exe
+	- vyber soubor pro kompilaci, Resource dir se vybere sám, kde se vytvoøí záloha, pracovní soubory, kompilovanı soubor
+	- Compile
+	- Upload
+- na kostce EV3 najdi zkompilovanı a nahranı soubor, prostøedním tlaèítkem jej spus, tlaèítkem zpìt jej vypni

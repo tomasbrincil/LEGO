@@ -1,0 +1,756 @@
+/**
+ * NXClib - NXC2CC Library
+ * 
+ * Copyright (C) 2016-2017  Faculty of Electrical Engineering, CTU in Prague
+ * Author: Jakub Vanek <nxc4ev3@vankovi.net>
+ * 
+ * 
+ * NXC-side headers & implementation
+ */
+
+//
+// Info macros
+//
+
+#define NXC4EV3
+#define NXC4EV3_VERSION 100
+
+
+//
+// NBC constants
+//
+
+#include "NBCCommon.h"
+// disable Array... NA macro
+#undef NA
+
+//
+// EV3 constants
+//
+
+#define FALSE false
+#define TRUE  true
+
+#undef  NUM_INPUTS
+#define NUM_INPUTS     4   
+#undef  NUM_LEDS
+#define NUM_LEDS       4   
+#undef  LCD_WIDTH
+#define LCD_WIDTH      178 
+#undef  LCD_HEIGHT
+#define LCD_HEIGHT     128 
+#undef  TOPLINE_HEIGHT
+#define TOPLINE_HEIGHT 10  
+
+#undef  OWNER_NONE
+#define OWNER_NONE 0x0000 
+
+#undef  LAYER_MASTER
+#define LAYER_MASTER 0x00 
+#undef  LAYER_SLAVE1
+#define LAYER_SLAVE1 0x10 
+#undef  LAYER_SLAVE2
+#define LAYER_SLAVE2 0x20 
+#undef  LAYER_SLAVE3
+#define LAYER_SLAVE3 0x40 
+#undef  LAYER_MASK
+#define LAYER_MASK   0x70 
+
+#undef  OUT_A
+#define OUT_A    0x01 
+#undef  OUT_B
+#define OUT_B    0x02 
+#undef  OUT_C
+#define OUT_C    0x04 
+#undef  OUT_D
+#define OUT_D    0x08 
+#undef  OUT_AB
+#define OUT_AB   0x03 
+#undef  OUT_AC
+#define OUT_AC   0x05 
+#undef  OUT_AD
+#define OUT_AD   0x09 
+#undef  OUT_BC
+#define OUT_BC   0x06 
+#undef  OUT_BD
+#define OUT_BD   0x0a 
+#undef  OUT_CD
+#define OUT_CD   0x0c 
+#undef  OUT_ABC
+#define OUT_ABC  0x07 
+#undef  OUT_BCD
+#define OUT_BCD  0x0e 
+#undef  OUT_ABCD
+#define OUT_ABCD 0x0f 
+#undef  OUT_ALL
+#define OUT_ALL  0x0f 
+
+#undef  OUT_MASK
+#define OUT_MASK 0x0f 
+
+#undef  OUT_FLOAT
+#define OUT_FLOAT 0x00
+#undef  OUT_OFF
+#define OUT_OFF   0x40
+#undef  OUT_ON
+#define OUT_ON    0x80
+
+#undef  OUT_REV
+#define OUT_REV    0x00
+#undef  OUT_TOGGLE
+#define OUT_TOGGLE 0x40
+#undef  OUT_FWD
+#define OUT_FWD    0x80
+
+#undef  OUT_POWER_DEFAULT
+#define OUT_POWER_DEFAULT -127
+
+#undef  OUT_REGMODE_IDLE
+#define OUT_REGMODE_IDLE  0 
+#undef  OUT_REGMODE_SPEED
+#define OUT_REGMODE_SPEED 1 
+#undef  OUT_REGMODE_SYNC
+#define OUT_REGMODE_SYNC  2 
+
+#undef  RESET_NONE
+#define RESET_NONE           0x00 
+#undef  RESET_COUNT
+#define RESET_COUNT          0x08 
+#undef  RESET_BLOCK_COUNT
+#define RESET_BLOCK_COUNT    0x20 
+#undef  RESET_ROTATION_COUNT
+#define RESET_ROTATION_COUNT 0x40 
+#undef  RESET_BLOCKANDTACHO
+#define RESET_BLOCKANDTACHO  0x28 
+#undef  RESET_ALL
+#define RESET_ALL            0x68 
+
+#undef  NUM_OUTPUTS
+#define NUM_OUTPUTS 4   
+
+#undef  DEVICE_TYPE_NXT_TOUCH
+#define DEVICE_TYPE_NXT_TOUCH           1  
+#undef  DEVICE_TYPE_NXT_LIGHT
+#define DEVICE_TYPE_NXT_LIGHT           2  
+#undef  DEVICE_TYPE_NXT_SOUND
+#define DEVICE_TYPE_NXT_SOUND           3  
+#undef  DEVICE_TYPE_NXT_COLOR
+#define DEVICE_TYPE_NXT_COLOR           4  
+#undef  DEVICE_TYPE_TACHO
+#define DEVICE_TYPE_TACHO               7  
+#undef  DEVICE_TYPE_MINITACHO
+#define DEVICE_TYPE_MINITACHO           8  
+#undef  DEVICE_TYPE_NEWTACHO
+#define DEVICE_TYPE_NEWTACHO            9  
+#undef  DEVICE_TYPE_THIRD_PARTY_START
+#define DEVICE_TYPE_THIRD_PARTY_START  50
+#undef  DEVICE_TYPE_THIRD_PARTY_END
+#define DEVICE_TYPE_THIRD_PARTY_END    99
+#undef  DEVICE_TYPE_IIC_UNKNOWN
+#define DEVICE_TYPE_IIC_UNKNOWN       100
+#undef  DEVICE_TYPE_NXT_TEST
+#define DEVICE_TYPE_NXT_TEST          101  
+#undef  DEVICE_TYPE_NXT_IIC
+#define DEVICE_TYPE_NXT_IIC           123  
+#undef  DEVICE_TYPE_TERMINAL
+#define DEVICE_TYPE_TERMINAL          124  
+#undef  DEVICE_TYPE_UNKNOWN
+#define DEVICE_TYPE_UNKNOWN           125  
+#undef  DEVICE_TYPE_NONE
+#define DEVICE_TYPE_NONE              126  
+#undef  DEVICE_TYPE_ERROR
+#define DEVICE_TYPE_ERROR             127  
+
+#undef  MAX_DEVICE_DATALENGTH
+#define MAX_DEVICE_DATALENGTH 32
+#undef  MAX_DEVICE_MODES
+#define MAX_DEVICE_MODES      8
+#undef  UART_DATA_LENGTH
+#define UART_DATA_LENGTH      MAX_DEVICE_DATALENGTH
+#undef  UART_BUFFER_SIZE
+#define UART_BUFFER_SIZE      64
+#undef  TYPE_NAME_LENGTH
+#define TYPE_NAME_LENGTH      11
+#undef  SYMBOL_LENGTH
+#define SYMBOL_LENGTH         4
+#undef  DEVICE_LOGBUF_SIZE
+#define DEVICE_LOGBUF_SIZE    300
+#undef  IIC_DATA_LENGTH
+#define IIC_DATA_LENGTH       MAX_DEVICE_DATALENGTH
+#undef  IIC_NAME_LENGTH
+#define IIC_NAME_LENGTH       8
+
+#undef  CONN_UNKNOWN
+#define CONN_UNKNOWN            111  
+#undef  CONN_DAISYCHAIN
+#define CONN_DAISYCHAIN         117  
+#undef  CONN_NXT_COLOR
+#define CONN_NXT_COLOR          118  
+#undef  CONN_NXT_DUMB
+#define CONN_NXT_DUMB           119  
+#undef  CONN_NXT_IIC
+#define CONN_NXT_IIC            120  
+#undef  CONN_INPUT_DUMB
+#define CONN_INPUT_DUMB         121  
+#undef  CONN_INPUT_UART
+#define CONN_INPUT_UART         122  
+#undef  CONN_OUTPUT_DUMB
+#define CONN_OUTPUT_DUMB        123  
+#undef  CONN_OUTPUT_INTELLIGENT
+#define CONN_OUTPUT_INTELLIGENT 124  
+#undef  CONN_OUTPUT_TACHO
+#define CONN_OUTPUT_TACHO       125  
+#undef  CONN_NONE
+#define CONN_NONE               126  
+#undef  CONN_ERROR
+#define CONN_ERROR              127  
+
+#undef  BUTTON_ID_UP
+#define BUTTON_ID_UP     0x01 
+#undef  BUTTON_ID_ENTER
+#define BUTTON_ID_ENTER  0x02 
+#undef  BUTTON_ID_DOWN
+#define BUTTON_ID_DOWN   0x04 
+#undef  BUTTON_ID_RIGHT
+#define BUTTON_ID_RIGHT  0x08 
+#undef  BUTTON_ID_LEFT
+#define BUTTON_ID_LEFT   0x10 
+#undef  BUTTON_ID_ESCAPE
+#define BUTTON_ID_ESCAPE 0x20 
+#undef  BUTTON_ID_ALL
+#define BUTTON_ID_ALL    0x3f 
+
+#undef  BTN1
+#define BTN1 BUTTON_ID_ESCAPE 
+#undef  BTN2
+#define BTN2 BUTTON_ID_RIGHT  
+#undef  BTN3
+#define BTN3 BUTTON_ID_LEFT   
+#undef  BTN4
+#define BTN4 BUTTON_ID_ENTER  
+#undef  BTN5
+#define BTN5 BUTTON_ID_UP     
+#undef  BTN6
+#define BTN6 BUTTON_ID_DOWN   
+
+#undef  BTNEXIT
+#define BTNEXIT   BTN1 
+#undef  BTNRIGHT
+#define BTNRIGHT  BTN2 
+#undef  BTNLEFT
+#define BTNLEFT   BTN3 
+#undef  BTNCENTER
+#define BTNCENTER BTN4 
+#undef  BTNUP
+#define BTNUP     BTN5 
+#undef  BTNDOWN
+#define BTNDOWN   BTN6 
+
+#undef  NO_OF_BTNS
+#define NO_OF_BTNS 6  
+#undef  NUM_BUTTONS
+#define NUM_BUTTONS 6 
+
+#undef  BTNSTATE_PRESSED_EV
+#define BTNSTATE_PRESSED_EV         0x01 
+#undef  BTNSTATE_SHORT_RELEASED_EV
+#define BTNSTATE_SHORT_RELEASED_EV  0x02 
+#undef  BTNSTATE_LONG_PRESSED_EV
+#define BTNSTATE_LONG_PRESSED_EV    0x04 
+#undef  BTNSTATE_LONG_RELEASED_EV
+#define BTNSTATE_LONG_RELEASED_EV   0x08 
+#undef  BTNSTATE_PRESSED_STATE
+#define BTNSTATE_PRESSED_STATE      0x80 
+#undef  BTNSTATE_NONE
+#define BTNSTATE_NONE               0x10 
+
+#undef  NXTCOLOR_IDX_RED
+#define NXTCOLOR_IDX_RED    0 
+#undef  NXTCOLOR_IDX_GREEN
+#define NXTCOLOR_IDX_GREEN  1 
+#undef  NXTCOLOR_IDX_BLUE
+#define NXTCOLOR_IDX_BLUE   2 
+#undef  NXTCOLOR_IDX_BLANK
+#define NXTCOLOR_IDX_BLANK  3 
+#undef  NUM_NXTCOLOR_IDX
+#define NUM_NXTCOLOR_IDX    4 
+
+#undef  NXTCOLOR_CAL_POINT_0
+#define NXTCOLOR_CAL_POINT_0    0 
+#undef  NXTCOLOR_CAL_POINT_1
+#define NXTCOLOR_CAL_POINT_1    1 
+#undef  NXTCOLOR_CAL_POINT_2
+#define NXTCOLOR_CAL_POINT_2    2 
+#undef  NUM_NXTCOLOR_CAL_POINTS
+#define NUM_NXTCOLOR_CAL_POINTS 3 
+
+#undef  INPUT_BLACKCOLOR
+#define INPUT_BLACKCOLOR  1 
+#undef  INPUT_BLUECOLOR
+#define INPUT_BLUECOLOR   2 
+#undef  INPUT_GREENCOLOR
+#define INPUT_GREENCOLOR  3 
+#undef  INPUT_YELLOWCOLOR
+#define INPUT_YELLOWCOLOR 4 
+#undef  INPUT_REDCOLOR
+#define INPUT_REDCOLOR    5 
+#undef  INPUT_WHITECOLOR
+#define INPUT_WHITECOLOR  6 
+
+#undef  FILETYPE_UNKNOWN
+#define FILETYPE_UNKNOWN  0x00
+#undef  FILETYPE_FOLDER
+#define FILETYPE_FOLDER   0x01
+#undef  FILETYPE_SOUND
+#define FILETYPE_SOUND    0x02
+#undef  FILETYPE_BYTECODE
+#define FILETYPE_BYTECODE 0x03
+#undef  FILETYPE_GRAPHICS
+#define FILETYPE_GRAPHICS 0x04
+#undef  FILETYPE_DATALOG
+#define FILETYPE_DATALOG  0x05
+#undef  FILETYPE_PROGRAM
+#define FILETYPE_PROGRAM  0x06
+#undef  FILETYPE_TEXT
+#define FILETYPE_TEXT     0x07
+#undef  FILETYPE_SDCARD
+#define FILETYPE_SDCARD   0x10
+#undef  FILETYPE_USBSTICK
+#define FILETYPE_USBSTICK 0x20
+#undef  NUM_FILETYPES
+#define NUM_FILETYPES     0x21 
+
+#undef  FONTTYPE_NORMAL
+#define FONTTYPE_NORMAL 0
+#undef  FONTTYPE_SMALL
+#define FONTTYPE_SMALL  1
+#undef  FONTTYPE_LARGE
+#define FONTTYPE_LARGE  2
+#undef  FONTTYPE_TINY
+#define FONTTYPE_TINY   3
+#undef  NUM_FONTTYPES
+#define NUM_FONTTYPES   4 
+
+#undef  ICONTYPE_NORMAL
+#define ICONTYPE_NORMAL 0
+#undef  ICONTYPE_SMALL
+#define ICONTYPE_SMALL  1
+#undef  ICONTYPE_LARGE
+#define ICONTYPE_LARGE  2
+#undef  ICONTYPE_MENU
+#define ICONTYPE_MENU   3
+#undef  ICONTYPE_ARROW
+#define ICONTYPE_ARROW  4
+#undef  NUM_ICONTYPES
+#define NUM_ICONTYPES   5 
+
+#undef  NICON_NONE
+#define NICON_NONE         -1
+#undef  NICON_RUN
+#define NICON_RUN          0
+#undef  NICON_FOLDER
+#define NICON_FOLDER       1
+#undef  NICON_FOLDER2
+#define NICON_FOLDER2      2
+#undef  NICON_USB
+#define NICON_USB          3
+#undef  NICON_SD
+#define NICON_SD           4
+#undef  NICON_SOUND
+#define NICON_SOUND        5
+#undef  NICON_IMAGE
+#define NICON_IMAGE        6
+#undef  NICON_SETTINGS
+#define NICON_SETTINGS     7
+#undef  NICON_ONOFF
+#define NICON_ONOFF        8
+#undef  NICON_SEARCH
+#define NICON_SEARCH       9
+#undef  NICON_WIFI
+#define NICON_WIFI         10
+#undef  NICON_CONNECTIONS
+#define NICON_CONNECTIONS  11
+#undef  NICON_ADD_HIDDEN
+#define NICON_ADD_HIDDEN   12
+#undef  NICON_TRASHBIN
+#define NICON_TRASHBIN     13
+#undef  NICON_VISIBILITY
+#define NICON_VISIBILITY   14
+#undef  NICON_KEY
+#define NICON_KEY          15
+#undef  NICON_CONNECT
+#define NICON_CONNECT      16
+#undef  NICON_DISCONNECT
+#define NICON_DISCONNECT   17
+#undef  NICON_UP
+#define NICON_UP           18
+#undef  NICON_DOWN
+#define NICON_DOWN         19
+#undef  NICON_WAIT1
+#define NICON_WAIT1        20
+#undef  NICON_WAIT2
+#define NICON_WAIT2        21
+#undef  NICON_BLUETOOTH
+#define NICON_BLUETOOTH    22
+#undef  NICON_INFO
+#define NICON_INFO         23
+#undef  NICON_TEXT
+#define NICON_TEXT         24
+#undef  NICON_QUESTIONMARK
+#define NICON_QUESTIONMARK 27
+#undef  NICON_INFO_FILE
+#define NICON_INFO_FILE    28
+#undef  NICON_DISC
+#define NICON_DISC         29
+#undef  NICON_CONNECTED
+#define NICON_CONNECTED    30
+#undef  NICON_OBP
+#define NICON_OBP          31
+#undef  NICON_OBD
+#define NICON_OBD          32
+#undef  NICON_OPENFOLDER
+#define NICON_OPENFOLDER   33
+#undef  NICON_BRICK1
+#define NICON_BRICK1       34
+#undef  NUM_NICONS
+#define NUM_NICONS         35
+
+#undef  PATH_SIZE
+#define PATH_SIZE     84  
+#undef  NAME_SIZE
+#define NAME_SIZE     32  
+#undef  EXT_SIZE
+#define EXT_SIZE      5   
+#undef  FILENAME_SIZE
+#define FILENAME_SIZE 120 
+#undef  MAC_SIZE
+#define MAC_SIZE      18  
+#undef  IP_SIZE
+#define IP_SIZE       16  
+#undef  BT_SIZE
+#define BT_SIZE       13  
+
+#undef  LED_BLACK
+#define LED_BLACK        0  
+#undef  LED_GREEN
+#define LED_GREEN        1  
+#undef  LED_RED
+#define LED_RED          2  
+#undef  LED_ORANGE
+#define LED_ORANGE       3  
+#undef  LED_GREEN_FLASH
+#define LED_GREEN_FLASH  4  
+#undef  LED_RED_FLASH
+#define LED_RED_FLASH    5  
+#undef  LED_ORANGE_FLASH
+#define LED_ORANGE_FLASH 6  
+#undef  LED_GREEN_PULSE
+#define LED_GREEN_PULSE  7  
+#undef  LED_RED_PULSE
+#define LED_RED_PULSE    8  
+#undef  LED_ORANGE_PULSE
+#define LED_ORANGE_PULSE 9  
+#undef  NUM_LED_PATTERNS
+#define NUM_LED_PATTERNS 10 
+
+
+#undef  SOUND_STATE_IDLE
+#define SOUND_STATE_IDLE         0 
+#undef  SOUND_STATE_SETUP_FILE
+#define SOUND_STATE_SETUP_FILE   1 
+#undef  SOUND_STATE_FILE
+#define SOUND_STATE_FILE         2 
+#undef  SOUND_STATE_FILE_LOOPING
+#define SOUND_STATE_FILE_LOOPING 3 
+#undef  SOUND_STATE_TONE
+#define SOUND_STATE_TONE         4 
+#undef  SOUND_STATE_TONE_LOOPING
+#define SOUND_STATE_TONE_LOOPING 5 
+#undef  SOUND_STATE_STOP
+#define SOUND_STATE_STOP         6 
+
+#undef  SOUND_CLICK
+#define SOUND_CLICK       0 
+#undef  SOUND_DOUBLE_BEEP
+#define SOUND_DOUBLE_BEEP 1 
+#undef  SOUND_DOWN
+#define SOUND_DOWN        2 
+#undef  SOUND_UP
+#define SOUND_UP          3 
+#undef  SOUND_LOW_BEEP
+#define SOUND_LOW_BEEP    4 
+#undef  SOUND_FAST_UP
+#define SOUND_FAST_UP     5 
+
+#undef  TONE_C2
+#define TONE_C2      65 
+#undef  TONE_CS2
+#define TONE_CS2     69 
+#undef  TONE_D2
+#define TONE_D2      73 
+#undef  TONE_DS2
+#define TONE_DS2     78 
+#undef  TONE_E2
+#define TONE_E2      82 
+#undef  TONE_F2
+#define TONE_F2      87 
+#undef  TONE_FS2
+#define TONE_FS2     92 
+#undef  TONE_G2
+#define TONE_G2      98 
+#undef  TONE_GS2
+#define TONE_GS2     104 
+#undef  TONE_A2
+#define TONE_A2      110 
+#undef  TONE_AS2
+#define TONE_AS2     117 
+#undef  TONE_B2
+#define TONE_B2      123 
+#undef  TONE_C3
+#define TONE_C3      131 
+#undef  TONE_CS3
+#define TONE_CS3     139 
+#undef  TONE_D3
+#define TONE_D3      147 
+#undef  TONE_DS3
+#define TONE_DS3     156 
+#undef  TONE_E3
+#define TONE_E3      165 
+#undef  TONE_F3
+#define TONE_F3      175 
+#undef  TONE_FS3
+#define TONE_FS3     185 
+#undef  TONE_G3
+#define TONE_G3      196 
+#undef  TONE_GS3
+#define TONE_GS3     208 
+#undef  TONE_A3
+#define TONE_A3      220 
+#undef  TONE_AS3
+#define TONE_AS3     233 
+#undef  TONE_B3
+#define TONE_B3      247 
+#undef  TONE_C4
+#define TONE_C4      262 
+#undef  TONE_CS4
+#define TONE_CS4     277 
+#undef  TONE_D4
+#define TONE_D4      294 
+#undef  TONE_DS4
+#define TONE_DS4     311 
+#undef  TONE_E4
+#define TONE_E4      330 
+#undef  TONE_F4
+#define TONE_F4      349 
+#undef  TONE_FS4
+#define TONE_FS4     370 
+#undef  TONE_G4
+#define TONE_G4      392 
+#undef  TONE_GS4
+#define TONE_GS4     415 
+#undef  TONE_A4
+#define TONE_A4      440 
+#undef  TONE_AS4
+#define TONE_AS4     466 
+#undef  TONE_B4
+#define TONE_B4      494 
+#undef  TONE_C5
+#define TONE_C5      523 
+#undef  TONE_CS5
+#define TONE_CS5     554 
+#undef  TONE_D5
+#define TONE_D5      587 
+#undef  TONE_DS5
+#define TONE_DS5     622 
+#undef  TONE_E5
+#define TONE_E5      659 
+#undef  TONE_F5
+#define TONE_F5      698 
+#undef  TONE_FS5
+#define TONE_FS5     740 
+#undef  TONE_G5
+#define TONE_G5      784 
+#undef  TONE_GS5
+#define TONE_GS5     831 
+#undef  TONE_A5
+#define TONE_A5      880 
+#undef  TONE_AS5
+#define TONE_AS5     932 
+#undef  TONE_B5
+#define TONE_B5      988 
+#undef  TONE_C6
+#define TONE_C6     1047 
+#undef  TONE_CS6
+#define TONE_CS6    1109 
+#undef  TONE_D6
+#define TONE_D6     1175 
+#undef  TONE_DS6
+#define TONE_DS6    1245 
+#undef  TONE_E6
+#define TONE_E6     1319 
+#undef  TONE_F6
+#define TONE_F6     1397 
+#undef  TONE_FS6
+#define TONE_FS6    1480 
+#undef  TONE_G6
+#define TONE_G6     1568 
+#undef  TONE_GS6
+#define TONE_GS6    1661 
+#undef  TONE_A6
+#define TONE_A6     1760 
+#undef  TONE_AS6
+#define TONE_AS6    1865 
+#undef  TONE_B6
+#define TONE_B6     1976 
+#undef  TONE_C7
+#define TONE_C7     2093 
+#undef  TONE_CS7
+#define TONE_CS7    2217 
+#undef  TONE_D7
+#define TONE_D7     2349 
+#undef  TONE_DS7
+#define TONE_DS7    2489 
+#undef  TONE_E7
+#define TONE_E7     2637 
+#undef  TONE_F7
+#define TONE_F7     2794 
+#undef  TONE_FS7
+#define TONE_FS7    2960 
+#undef  TONE_G7
+#define TONE_G7     3136 
+#undef  TONE_GS7
+#define TONE_GS7    3322 
+#undef  TONE_A7
+#define TONE_A7     3520 
+#undef  TONE_AS7
+#define TONE_AS7    3729 
+#undef  TONE_B7
+#define TONE_B7     3951 
+
+#undef  NOTE_WHOLE
+#define NOTE_WHOLE   1000            
+#undef  NOTE_HALF
+#define NOTE_HALF    (NOTE_WHOLE/2)  
+#undef  NOTE_QUARTER
+#define NOTE_QUARTER (NOTE_WHOLE/4)  
+#undef  NOTE_EIGHT
+#define NOTE_EIGHT   (NOTE_WHOLE/8)  
+#undef  NOTE_SIXTEEN
+#define NOTE_SIXTEEN (NOTE_WHOLE/16) 
+
+#undef  LCD_LINE13
+#undef  LCD_LINE12
+#undef  LCD_LINE11
+#undef  LCD_LINE10
+#undef  LCD_LINE9
+#undef  LCD_LINE8
+#undef  LCD_LINE7
+#undef  LCD_LINE6
+#undef  LCD_LINE5
+#undef  LCD_LINE4
+#undef  LCD_LINE3
+#undef  LCD_LINE2
+#undef  LCD_LINE1
+
+#define LCD_LINE13 120
+#define LCD_LINE12 110
+#define LCD_LINE11 100
+#define LCD_LINE10 90
+#define LCD_LINE9  80
+#define LCD_LINE8  70
+#define LCD_LINE7  60
+#define LCD_LINE6  50
+#define LCD_LINE5  40
+#define LCD_LINE4  30
+#define LCD_LINE3  20
+#define LCD_LINE2  10
+#define LCD_LINE1  0
+
+#undef  DISPLAY_ERASE_ALL
+#define DISPLAY_ERASE_ALL       0x00     
+#undef  DISPLAY_PIXEL
+#define DISPLAY_PIXEL           0x01     
+#undef  DISPLAY_HORIZONTAL_LINE
+#define DISPLAY_HORIZONTAL_LINE 0x02     
+#undef  DISPLAY_VERTICAL_LINE
+#define DISPLAY_VERTICAL_LINE   0x03     
+#undef  DISPLAY_CHAR
+#define DISPLAY_CHAR            0x04     
+#undef  DISPLAY_ERASE_LINE
+#define DISPLAY_ERASE_LINE      0x05     
+#undef  DISPLAY_FILL_REGION
+#define DISPLAY_FILL_REGION     0x06     
+#undef  DISPLAY_FRAME
+#define DISPLAY_FRAME           0x07     
+
+#undef  DRAW_OPT_NORMAL
+#define DRAW_OPT_NORMAL                     (0x0000) 
+#undef  DRAW_OPT_CLEAR_WHOLE_SCREEN
+#define DRAW_OPT_CLEAR_WHOLE_SCREEN         (0x0001) 
+#undef  DRAW_OPT_CLEAR_EXCEPT_STATUS_SCREEN
+#define DRAW_OPT_CLEAR_EXCEPT_STATUS_SCREEN (0x0002) 
+
+#undef  DRAW_OPT_CLEAR_PIXELS
+#define DRAW_OPT_CLEAR_PIXELS               (0x0004) 
+#undef  DRAW_OPT_CLEAR
+#define DRAW_OPT_CLEAR                      (0x0004) 
+#undef  DRAW_OPT_INVERT
+#define DRAW_OPT_INVERT                     (0x0004) 
+
+#undef  DRAW_OPT_LOGICAL_COPY
+#define DRAW_OPT_LOGICAL_COPY               (0x0000) 
+#undef  DRAW_OPT_LOGICAL_AND
+#define DRAW_OPT_LOGICAL_AND                (0x0008) 
+#undef  DRAW_OPT_LOGICAL_OR
+#define DRAW_OPT_LOGICAL_OR                 (0x0010) 
+#undef  DRAW_OPT_LOGICAL_XOR
+#define DRAW_OPT_LOGICAL_XOR                (0x0018) 
+
+#undef  DRAW_OPT_FILL_SHAPE
+#define DRAW_OPT_FILL_SHAPE                 (0x0020) 
+
+#undef  DRAW_OPT_CLEAR_SCREEN_MODES
+#define DRAW_OPT_CLEAR_SCREEN_MODES         (0x0003) 
+#undef  DRAW_OPT_LOGICAL_OPERATIONS
+#define DRAW_OPT_LOGICAL_OPERATIONS         (0x0018) 
+
+#undef  DRAW_OPT_POLYGON_POLYLINE
+#define DRAW_OPT_POLYGON_POLYLINE           (0x0400) 
+
+#undef  DRAW_OPT_CLEAR_LINE
+#define DRAW_OPT_CLEAR_LINE                 (0x0800) 
+#undef  DRAW_OPT_CLEAR_EOL
+#define DRAW_OPT_CLEAR_EOL                  (0x1000) 
+
+#undef  CS_TIMER_1
+#define CS_TIMER_1    0 
+#undef  CS_TIMER_2
+#define CS_TIMER_2    1 
+#undef  CS_TIMER_3
+#define CS_TIMER_3    2 
+#undef  CS_TIMER_4
+#define CS_TIMER_4    3 
+#undef  NUM_CS_TIMERS
+#define NUM_CS_TIMERS 4 
+
+#undef  MS_TIMER_1
+#define MS_TIMER_1    0 
+#undef  MS_TIMER_2
+#define MS_TIMER_2    1 
+#undef  MS_TIMER_3
+#define MS_TIMER_3    2 
+#undef  MS_TIMER_4
+#define MS_TIMER_4    3 
+#undef  NUM_MS_TIMERS
+#define NUM_MS_TIMERS 4 
+
+#undef  US_TIMER_1
+#define US_TIMER_1    0 
+#undef  US_TIMER_2
+#define US_TIMER_2    1 
+#undef  US_TIMER_3
+#define US_TIMER_3    2 
+#undef  US_TIMER_4
+#define US_TIMER_4    3 
+#undef  NUM_US_TIMERS
+#define NUM_US_TIMERS 4 

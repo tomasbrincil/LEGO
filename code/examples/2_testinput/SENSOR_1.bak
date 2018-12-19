@@ -1,0 +1,12 @@
+task main() {
+ SetSensorTouch(IN_1);
+ while(true) {
+  if(Sensor(IN_1) == 1) {
+   TextOut(0, 0, "1");
+    } else {
+     TextOut(0, 0, "0");
+    }
+  }
+}
+
+

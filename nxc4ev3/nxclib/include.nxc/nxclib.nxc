@@ -1,0 +1,228 @@
+/**
+ * NXClib - NXC2CC Library
+ * 
+ * Copyright (C) 2016-2017  Faculty of Electrical Engineering, CTU in Prague
+ * Author: Jakub Vanek <nxc4ev3@vankovi.net>
+ * 
+ * 
+ * NXC-side headers & implementation
+ */
+
+#include "constants.nxc"
+
+
+//
+// EV3 Command
+//
+
+unsigned long CurrentTick();
+unsigned long FirstTick();
+void Wait(unsigned long ms);
+void Yield();
+void StopAllTasks();
+void Stop(bool really);
+// void ExitTo(task to); // TODO native
+// void Follows(task... tasks); // TODO native + analysis
+void Acquire(mutex &m);
+void Release(mutex &m);
+// void StartTask(task t); // TODO native
+// void StopTask(task t); // TODO native
+
+
+
+//
+// EV3 Button
+//
+
+void SetLedWarning(bool Value);
+byte LedWarning();
+
+void SetLedPattern(byte Pattern);
+byte LedPattern();
+
+unsigned short ButtonWaitForAnyEvent(unsigned int timeout);
+unsigned short ButtonWaitForAnyPress(unsigned int timeout);
+
+bool ButtonIsUp(byte Button);
+bool ButtonIsDown(byte Button);
+
+void ButtonWaitForPress(byte Button);
+void ButtonWaitForPressAndRelease(byte Button);
+
+// NXC-style API functions (no support for short press, long press,
+// short release, long release, or press counts
+bool ButtonPressed(byte btn, bool resetCount = false);
+char ReadButtonEx(byte btn, bool reset, bool &pressed, unsigned short &count);
+byte ButtonState(byte btn);
+
+// TODO button tracking thread
+/*
+byte ButtonCount(const byte btn, bool resetCount = false);
+byte ButtonPressCount(const byte btn);
+byte ButtonLongPressCount(const byte btn);
+byte ButtonShortReleaseCount(const byte btn);
+byte ButtonLongReleaseCount(const byte btn);
+byte ButtonReleaseCount(const byte btn);
+void SetButtonLongPressCount(const byte btn, const byte n);
+void SetButtonLongReleaseCount(const byte btn, const byte n);
+void SetButtonPressCount(const byte btn, const byte n);
+void SetButtonReleaseCount(const byte btn, const byte n);
+void SetButtonShortReleaseCount(const byte btn, const byte n);
+void SetButtonState(const byte btn, const byte state);
+*/
+
+//
+// EV3 Display
+//
+
+
+struct __native LocationType {
+  int X;
+  int Y;
+};
+
+void ResetScreen();
+void ClearScreen();
+void printf(string format, long   value);
+void printf(string format, float  value);
+void printf(string format, string value);
+char CircleOut(int x, int y, byte radius, unsigned long options=DRAW_OPT_NORMAL);
+char LineOut(int x1, int y1, int x2, int y2, unsigned long options=DRAW_OPT_NORMAL);
+char PointOut(int x, int y, unsigned long options=DRAW_OPT_NORMAL);
+char RectOut(int x, int y, int width, int height, unsigned long options=DRAW_OPT_NORMAL);
+char TextOut(int x, int y, string str, unsigned long options=DRAW_OPT_NORMAL);
+char NumOut(int x, int y, int value, unsigned long options=DRAW_OPT_NORMAL);
+char EllipseOut(int x, int y, byte radiusX, byte radiusY, unsigned long options=DRAW_OPT_NORMAL);
+char PolyOut(LocationType points[], unsigned long options=DRAW_OPT_NORMAL); // fixme struct bug
+char GraphicOut(int x, int y, string filename, unsigned long options=DRAW_OPT_NORMAL);
+char GraphicArrayOut(int x, int y, byte data[], unsigned long options=DRAW_OPT_NORMAL);
+
+
+//
+// EV3 Output
+//
+void OffEx(byte outputs, const byte reset);
+void FloatEx(byte outputs, const byte reset);
+void CoastEx(byte outputs, const byte reset);
+void OnFwdEx(byte outputs, char pwr, const byte reset);
+void OnRevEx(byte outputs, char pwr, const byte reset);
+void OnFwdRegEx(byte outputs, char pwr, byte regmode, const byte reset);
+void OnRevRegEx(byte outputs, char pwr, byte regmode, const byte reset);
+void OnFwdSyncEx(byte outputs, char pwr, char turnpct, const byte reset);
+void OnRevSyncEx(byte outputs, char pwr, char turnpct, const byte reset);
+void RotateMotorEx(byte outputs, char pwr, long angle, short turnpct, bool sync, bool stop_);
+void ResetTachoCount(byte outputs);
+void ResetBlockTachoCount(byte outputs);
+void ResetRotationCount(byte outputs);
+void ResetAllTachoCounts(byte outputs);
+void ResetCount(byte Outputs, byte reset);
+char MotorPower(byte output);
+char MotorActualSpeed(byte output);
+long MotorTachoCount(byte output);
+long MotorBlockTachoCount(byte output);
+long MotorRotationCount(byte output);
+bool MotorBusy(byte Output);
+
+void RotateMotorRampNoWait(byte Outputs, char Speed, int accelAngle, int steadyAngle, int decelAngle, bool Stop);
+void RotateMotorRamp      (byte Outputs, char Speed, int accelAngle, int steadyAngle, int decelAngle, bool Stop);
+
+#define RESET_PRG_DEFAULT RESET_BLOCKANDTACHO
+void Off(byte outputs) {
+	OffEx(outputs, RESET_PRG_DEFAULT);
+}
+void Coast(byte outputs) {
+	CoastEx(outputs, RESET_PRG_DEFAULT);
+}
+void Float(byte outputs) {
+	FloatEx(outputs, RESET_PRG_DEFAULT);
+}
+void OnFwd(byte outputs, char pwr) {
+	OnFwdEx(outputs, pwr, RESET_PRG_DEFAULT);
+}
+void OnRev(byte outputs, char pwr) {
+	OnRevEx(outputs, pwr, RESET_PRG_DEFAULT);
+}
+void OnFwdReg(byte outputs, char pwr, byte regmode) {
+	OnFwdRegEx(outputs, pwr, regmode, RESET_PRG_DEFAULT);
+}
+void OnRevReg(byte outputs, char pwr, byte regmode) {
+	OnRevRegEx(outputs, pwr, regmode, RESET_PRG_DEFAULT);
+}
+void OnFwdSync(byte outputs, char pwr, char turnpct) {
+	OnFwdSyncEx(outputs, pwr, turnpct, RESET_PRG_DEFAULT);
+}
+void OnRevSync(byte outputs, char pwr, char turnpct) {
+	OnRevSyncEx(outputs, pwr, turnpct, RESET_PRG_DEFAULT);
+}
+void RotateMotor(byte outputs, char pwr, long angle) {
+	RotateMotorEx(outputs, pwr, angle, 0, TRUE, TRUE);
+}
+
+
+//
+// EV3 Sound
+//
+
+char PlayFile(string filename);
+// todo sr is not supported
+char PlayFileEx(string filename, byte volume, bool loop, unsigned int sr = 0);
+char PlayTone(unsigned int frequency, unsigned int duration);
+// todo loop is not supported
+char PlayToneEx(unsigned int frequency, unsigned int duration, byte volume, bool loop);
+byte SoundState();
+byte StopSound();
+
+//
+// EV3 Sensor
+//
+
+byte SensorUS(byte port);
+void SetSensorType(byte port, byte type);
+//void SetSensorMode(byte port, byte mode);
+void ClearSensor(byte port);
+void ResetSensor(byte port);
+void SetSensor(byte port, const unsigned int config);
+void SetSensorTouch(byte port);
+void SetSensorLight(byte port, bool bActive = true);
+void SetSensorSound(byte port, bool bdBScaling = true);
+void SetSensorLowspeed(byte port, bool bIsPowered = true);
+void SetSensorUltrasonic(byte port);
+void SetSensorUltrasonicMM(byte port);
+void SetSensorColorFull(byte port);
+void SetSensorColorRed(byte port);
+void SetSensorColorGreen(byte port);
+void SetSensorColorBlue(byte port);
+void SetSensorColorNone(byte port);
+void SetSensorHTGyro(byte port);
+int SensorHTGyro(byte port, int offset = 0);
+
+float GetInput(byte port, const byte field);
+//void SetInput(byte port, const int field, float value); // makes no sense
+unsigned int Sensor(byte port);
+//bool SensorBoolean(const byte port);
+//byte SensorDigiPinsDirection(const byte port);
+//byte SensorDigiPinsOutputLevel(const byte port);
+//byte SensorDigiPinsStatus(const byte port);
+bool SensorInvalid(byte port);
+byte SensorMode(byte port);
+unsigned int SensorNormalized(byte port);
+unsigned int SensorRaw(byte port);
+unsigned int SensorScaled(byte port);
+byte SensorType(byte port);
+unsigned int SensorValue(byte port);
+//bool SensorValueBool(const byte port);
+unsigned int SensorValueRaw(byte port);
+/*
+int ReadSensorColorEx(byte port, int & colorval, unsigned int & raw[], unsigned int & norm[], int & scaled[]);
+int ReadSensorColorRaw(byte port, unsigned int & rawVals[]);
+unsigned int ColorADRaw(byte port, byte color);
+bool ColorBoolean(byte port, byte color);
+long ColorCalibration(byte port, byte point, byte color);
+byte ColorCalibrationState(byte port);
+unsigned int ColorCalLimits(byte port, byte point);
+unsigned int ColorSensorRaw(byte port, byte color);
+unsigned int ColorSensorValue(byte port, byte color);
+*/
+
+
+int Random(unsigned int n = 0);
