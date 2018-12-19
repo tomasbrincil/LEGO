@@ -12,3 +12,12 @@
 	- Compile
 	- Upload
 - na kostce EV3 najdi zkompilovaný a nahraný soubor, prostředním tlačítkem jej spusť, tlačítkem zpět jej vypni
+
+
+
+## Zdroje
+
+* http://bricxcc.sourceforge.net/
+* https://robosoutez.fel.cvut.cz/nxc4ev3
+* http://bricxcc.sourceforge.net/nbc/nxcdoc/nxcapi/index.html
+
